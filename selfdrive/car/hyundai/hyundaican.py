@@ -41,9 +41,25 @@ def create_lkas11(packer, car_fingerprint, bus, apply_steer, steer_req, cnt, ena
     values["CF_Lkas_HbaOpt"] = lkas11["CF_Lkas_HbaOpt"] if keep_stock else 1
     values["CF_Lkas_FcwOpt_USM"] = lkas11["CF_Lkas_FcwOpt_USM"] if keep_stock else 0
   if car_fingerprint == CAR.KIA_CARDENZA:
-    values["CF_Lkas_Bca_R"] = 0
-    values["CF_Lkas_FcwOpt_USM"] = 1
-    values["CF_Lkas_LdwsOpt_USM"] = 3
+    ########################################################
+    values["CF_Lkas_Bca_R"] = int(left_lane) + (int(right_lane) << 1)
+    values["CF_Lkas_FcwOpt_USM"] = 2 if enabled else 1
+    # FcwOpt_USM 5 = Orange blinking car + lanes
+    # FcwOpt_USM 4 = Orange car + lanes
+    # FcwOpt_USM 3 = Green blinking car + lanes
+    # FcwOpt_USM 2 = Green car + lanes
+    # FcwOpt_USM 1 = White car + lanes
+    # FcwOpt_USM 0 = No car + lanes
+    values["CF_Lkas_SysWarning"] = 4 if sys_warning else 0
+    # SysWarning 4 = keep hands on wheel
+    # SysWarning 5 = keep hands on wheel (red)
+    # SysWarning 6 = keep hands on wheel (red) + beep
+    # Note: the warning is hidden while the blinkers are on
+    values["CF_Lkas_LdwsOpt_USM"] = 2
+    ########################################################
+    #values["CF_Lkas_Bca_R"] = 0
+    #values["CF_Lkas_FcwOpt_USM"] = 1
+    #values["CF_Lkas_LdwsOpt_USM"] = 3
 
   dat = packer.make_can_msg("LKAS11", 0, values)[2]
 
